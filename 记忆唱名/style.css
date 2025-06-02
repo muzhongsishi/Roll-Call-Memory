@@ -152,4 +152,126 @@ label[for="difficulty"] {
     color: #6a0dad;
     font-weight: bold;
     margin-right: 5px;
+}
+
+/* Game Mode Selection */
+.mode-selection-area {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.mode-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: 2px solid transparent; /* Transparent border to maintain size on active */
+    border-radius: 8px;
+    background-color: #e1bee7; /* Lighter purple for inactive mode buttons */
+    color: #6a0dad;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.mode-button.active-mode {
+    background-color: #7e57c2; /* Purple from main buttons for active mode */
+    color: white;
+    border-color: #5e35b1; /* Darker border for active state */
+    font-weight: bold;
+}
+
+.mode-button:not(.active-mode):hover {
+    background-color: #ce93d8;
+}
+
+/* Game Modes Wrapper and Cards */
+.game-modes-wrapper {
+    position: relative; /* For positioning cards on top of each other */
+    min-height: 300px; /* Adjust as needed based on content */
+    margin-bottom: 20px;
+}
+
+.game-mode-card {
+    background-color: #fff;
+    border: 1px solid #d1c4e9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: absolute; /* Stack cards */
+    width: 100%;
+    top: 0;
+    left: 0;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, z-index 0.5s ease-in-out;
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    z-index: 1;
+    display: none; /* Initially hide all cards, JS will make one active */
+    min-height: 350px; /* Problem 3 Fix: Set a minimum height for game mode cards */
+    box-sizing: border-box; /* Ensure padding and border are included in height calculation */
+}
+
+.game-mode-card.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    z-index: 2;
+    display: block; /* Show active card */
+}
+
+.game-mode-card.inactive-stacked {
+    /* Style for the card that is "behind" in the stack (optional visual cue) */
+    transform: scale(0.9) translateY(10px) translateX(-10px) rotate(-2deg);
+    opacity: 0.7;
+    z-index: 0;
+    display: block;
+}
+
+.game-mode-card h2 {
+    color: #6a0dad;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Sequence Mode Specific Styles */
+#sequence-numbers-display {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.sequence-number-box {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sequence-number-box.correct {
+    background-color: #c8e6c9; /* Light green */
+    border-color: #66bb6a;
+    color: #2e7d32;
+}
+
+.sequence-number-box.incorrect {
+    background-color: #ffcdd2; /* Light red */
+    border-color: #ef5350;
+    color: #c62828;
+}
+
+#sequence-options-display .option-card {
+    /* Options in sequence mode might be fewer, adjust styling if needed */
+    padding: 8px 12px; /* Slightly smaller if they contain less text */
+}
+
+#user-selection-display h3 {
+    color: #6a0dad;
+    font-size: 1.1em;
+    margin-bottom: 10px;
 } 
