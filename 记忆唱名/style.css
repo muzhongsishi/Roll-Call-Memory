@@ -18,6 +18,12 @@ body {
     text-align: center;
     width: 90%; /* Control max width */
     max-width: 600px; /* Set a max-width for larger screens */
+    display: flex; /* Ensure it is a flex container */
+    flex-direction: column; /* Stack children vertically */
+    max-height: 100vh; /* Constrain height to viewport */
+    overflow-y: auto; /* Ensure this is active for the container */
+    padding-bottom: 50px; /* Added significant padding at the bottom of the container */
+    box-sizing: border-box; /* Ensure padding is included in height calculation if not already */
 }
 
 h1 {
@@ -38,22 +44,27 @@ h1 {
 }
 
 .number-card, .option-card, .selected-card {
-    padding: 10px 15px;
-    border: 2px solid #d1c4e9; /* 淡紫色边框 */
-    border-radius: 10px; /* 更圆的卡片边角 */
-    background-color: #f3e5f5; /* 更淡的紫色背景 */
-    font-size: 1.1em;
-    min-width: 60px; /* Ensure cards have a minimum width */
-    text-align: center; /* Center text within cards */
+    padding: 10px 15px; /* Base padding */
+    border: 2px solid #d1c4e9;
+    border-radius: 10px;
+    background-color: #f3e5f5;
+    font-size: 1.1em;  /* Base font size */
+    min-width: 55px;   /* Base min-width, reduced slightly */
+    text-align: center;
+    box-sizing: border-box; /* Ensure padding/border included in width/height */
 }
 
 .option-card {
     cursor: pointer;
-    display: flex; /* Enable flex for vertical alignment */
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center children horizontally */
-    justify-content: center; /* Center children vertically */
-    transition: transform 0.2s ease, background-color 0.2s ease; /* 平滑过渡 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    /* Adjusting padding specifically for option cards if they need to be smaller */
+    padding: 8px 10px; 
+    font-size: 1em; /* Slightly smaller font for option cards specifically */
+    min-width: 50px; /* Further reduced min-width for option cards */
 }
 
 .option-card:hover {
@@ -186,28 +197,31 @@ label[for="difficulty"] {
 
 /* Game Modes Wrapper and Cards */
 .game-modes-wrapper {
-    position: relative; /* For positioning cards on top of each other */
-    min-height: 300px; /* Adjust as needed based on content */
-    margin-bottom: 20px;
+    position: relative;
+    height: 380px; 
+    margin-bottom: 20px; /* Keep this reasonable, primary spacing is AFTER this block */
+    width: 100%;
+    flex-shrink: 0; 
 }
 
 .game-mode-card {
     background-color: #fff;
-    border: 1px solid #d1c4e9;
+    /* border: 1px solid #d1c4e9; /* Can be removed if wrapper has border and clips */
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: absolute; /* Stack cards */
+    padding: 15px;
+    /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Can be on wrapper or card */
+    position: absolute;
     width: 100%;
+    height: 100%; /* Fill the fixed height of the wrapper */
     top: 0;
     left: 0;
     transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, z-index 0.5s ease-in-out;
     opacity: 0;
     transform: scale(0.95) translateY(20px);
     z-index: 1;
-    display: none; /* Initially hide all cards, JS will make one active */
-    min-height: 350px; /* Problem 3 Fix: Set a minimum height for game mode cards */
-    box-sizing: border-box; /* Ensure padding and border are included in height calculation */
+    display: none;
+    overflow-y: auto; /* Crucial: Card's internal content will scroll if it exceeds wrapper's fixed height */
+    box-sizing: border-box;
 }
 
 .game-mode-card.active {
@@ -274,4 +288,104 @@ label[for="difficulty"] {
     color: #6a0dad;
     font-size: 1.1em;
     margin-bottom: 10px;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+    body {
+        padding: 5px; /* Reduce body padding on small screens */
+    }
+    .container {
+        padding: 15px;
+        padding-bottom: 40px; /* Added padding at the bottom for small screens */
+        width: 98%;    /* Allow container to be wider */
+    }
+    h1 {
+        font-size: 1.8em; /* Slightly smaller title */
+        margin-bottom: 15px;
+    }
+    .mode-button {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    select#difficulty, button {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+    .number-card, .option-card, .selected-card {
+        padding: 6px 8px;   /* Further reduce padding for cards on small screens */
+        font-size: 0.9em;   /* Further reduce font for cards on small screens */
+        min-width: 40px;    /* Further reduce min-width for cards on small screens */
+    }
+    .option-card {
+        /* Specific overrides for option-card on small screens if needed */
+        padding: 5px 6px; 
+        font-size: 0.85em;
+        min-width: 35px;
+    }
+    .option-card .option-note-name {
+        font-size: 0.9em; /* Adjust inner elements if card font size changed */
+    }
+    .option-card .option-solfege {
+        font-size: 0.75em; /* Adjust inner elements */
+    }
+    .selected-card .option-note-name {
+        font-size: 1em;
+    }
+    .selected-card .option-solfege {
+        font-size: 0.8em;
+    }
+    #numbers-display, #options-display, #selected-notes {
+        gap: 8px; /* Reduce gap between cards */
+        margin-bottom: 15px;
+    }
+    .game-modes-wrapper {
+        height: 330px; 
+        margin-bottom: 15px; 
+    }
+    .game-mode-card {
+        padding: 12px;
+    }
+    #sequence-numbers-display {
+        gap: 5px; /* Smaller gap for sequence boxes */
+    }
+    .sequence-number-box {
+        width: 30px;  /* Smaller sequence boxes */
+        height: 30px;
+        font-size: 0.85em;
+    }
+    #score-display {
+        font-size: 1.1em;
+        margin-bottom: 10px; /* Ensure score is not too close to bottom */
+    }
+    /* Ensure game content doesn't push score off-screen too easily */
+    /* display: flex; flex-direction: column; max-height: 100vh; are already set */
+    #feedback,
+    #score-display,
+    #checkAnswer,
+    #nextLevel {
+        margin-top: 8px;
+        margin-bottom: 8px; /* Reduced this for small screens too */
+        /* flex-shrink: 0; is inherited */
+    }
+} 
+
+#nextLevel, #checkAnswer { /* Explicitly target these buttons if they are the ones being obscured */
+    margin-top: 20px; /* Increased margin-top for these specific buttons */
+} 
+
+/* General spacing for elements that appear below the game modes wrapper */
+#feedback,
+#score-display,
+#checkAnswer,
+#nextLevel {
+    margin-top: 10px; 
+    margin-bottom: 10px; /* Reduced this as container padding-bottom will handle end-space */
+    flex-shrink: 0; /* Prevent these from shrinking */
+}
+
+#checkAnswer,
+#nextLevel { /* These are the main action buttons below the game area */
+    margin-top: 20px; /* Increased margin-top for these specific buttons */
+    margin-bottom: 15px; /* Ensure some space below them too */
 } 

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('[DEBUG] DOMContentLoaded - Script execution started.');
+
     const noteMapping = {
         1: { solfege: 'do', noteName: 'C' },
         2: { solfege: 're', noteName: 'D' },
@@ -18,6 +20,112 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextLevelButton = document.getElementById('nextLevel');
     const feedbackDisplay = document.getElementById('feedback');
     const scoreDisplay = document.getElementById('score');
+
+    // Audio Elements (Placeholders - replace with actual paths)
+    console.log('[DEBUG] Initializing AudioContext...');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext) {
+        console.log('[DEBUG] AudioContext initialized successfully. State:', audioContext.state);
+    } else {
+        console.error('[DEBUG] FAILED to initialize AudioContext.');
+        // If AudioContext fails, sound functions will not work.
+    }
+
+    const sounds = {
+        click: 'assets/click.mp3',          // Replace with your click sound file
+        correct: 'assets/correct.mp3',      // Replace with your correct sound file
+        incorrect: 'assets/incorrect.mp3',  // Replace with your incorrect sound file
+        victory: 'assets/victory.mp3'       // Replace with your victory sound file
+    };
+    let soundBuffers = {}; // To store preloaded sound data
+
+    // Function to preload sounds
+    function loadSound(name, url) {
+        console.log(`[DEBUG] loadSound: Attempting to load '${name}' from '${url}'`);
+        if (!audioContext) {
+            console.error(`[DEBUG] loadSound: AudioContext not available for '${name}'.`);
+            return Promise.reject('AudioContext not available');
+        }
+        return fetch(url)
+            .then(response => {
+                console.log(`[DEBUG] loadSound('${name}'): Fetch response status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Sound file ${url} not found or failed to load (status: ${response.status}).`);
+                }
+                return response.arrayBuffer();
+            })
+            .then(arrayBuffer => {
+                console.log(`[DEBUG] loadSound('${name}'): ArrayBuffer received, decoding...`);
+                return audioContext.decodeAudioData(arrayBuffer);
+            })
+            .then(audioBuffer => {
+                console.log(`[DEBUG] loadSound('${name}'): Decoded successfully, storing buffer.`);
+                soundBuffers[name] = audioBuffer;
+            })
+            .catch(error => {
+                console.error(`[DEBUG] Could not load sound: '${name}' from '${url}'. Error:`, error);
+            });
+    }
+
+    // Preload all sounds when the script runs
+    console.log('[DEBUG] Preloading sounds...');
+    if (audioContext) { // Only attempt to load if context is there
+        Object.keys(sounds).forEach(key => {
+            console.log(`[DEBUG] Initiating load for sound key: '${key}'`);
+            loadSound(key, sounds[key]);
+        });
+    } else {
+        console.warn('[DEBUG] Sounds not preloaded because AudioContext is not available.');
+    }
+
+    function playSound(name) {
+        console.log(`[DEBUG] playSound: Attempting to play '${name}'. Buffer exists:`, !!soundBuffers[name]);
+        if (!audioContext) {
+            console.error(`[DEBUG] playSound: AudioContext not available for '${name}'.`);
+            return;
+        }
+        if (audioContext.state === 'suspended') {
+            console.warn('[DEBUG] playSound: AudioContext is suspended. Attempting to resume...');
+            audioContext.resume().then(() => {
+                console.log('[DEBUG] playSound: AudioContext resumed. Now playing sound.');
+                if (soundBuffers[name]) {
+                    const source = audioContext.createBufferSource();
+                    source.buffer = soundBuffers[name];
+
+                    // Volume control
+                    const gainNode = audioContext.createGain();
+                    if (name === 'victory') {
+                        gainNode.gain.value = 0.15; // Set volume to 15% for victory sound
+                        console.log(`[DEBUG] playSound: Applying 15% volume for '${name}'`);
+                    } else {
+                        gainNode.gain.value = 1.0; // Default volume for other sounds
+                    }
+
+                    source.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    source.start(0);
+                }
+            }).catch(err => console.error('[DEBUG] Failed to resume AudioContext:', err));
+        } else if (soundBuffers[name]) {
+            const source = audioContext.createBufferSource();
+            source.buffer = soundBuffers[name];
+
+            // Volume control
+            const gainNode = audioContext.createGain();
+            if (name === 'victory') {
+                gainNode.gain.value = 0.25; // Set volume to 25% for victory sound
+                console.log(`[DEBUG] playSound: Applying 25% volume for '${name}'`);
+            } else {
+                gainNode.gain.value = 1.0; // Default volume for other sounds
+            }
+
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            source.start(0);
+        } else {
+            console.warn(`[DEBUG] Sound not loaded or found: '${name}', cannot play.`);
+        }
+    }
 
     // Game Mode Elements
     const classicModeButton = document.getElementById('selectClassicMode');
@@ -181,12 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
             optionCard.addEventListener('click', () => handleOptionClickClassic(noteDetail.noteName, optionCard));
             optionsDisplay.appendChild(optionCard);
         });
+        // playSound('click'); // Optional: sound for starting game/new round
     }
 
     // Renamed handleOptionClick to handleOptionClickClassic
     function handleOptionClickClassic(selectedNoteName, cardElement) {
         if (!gameStarted || userSelectedNoteNames.length >= currentDifficulty) return;
-
+        playSound('click'); // Sound for clicking an option
         userSelectedNoteNames.push(selectedNoteName);
         const selectedCard = document.createElement('div');
         selectedCard.classList.add('selected-card');
@@ -233,9 +342,14 @@ document.addEventListener('DOMContentLoaded', () => {
             score += currentDifficulty;
             scoreDisplay.textContent = score;
             nextLevelButton.style.display = 'inline-block';
+            playSound('correct'); // Sound for correct answer
+            // Check for perfect score for victory effect
+            // In classic mode, a perfect score means getting all `currentDifficulty` correct.
+            triggerVictoryEffect(); // Assuming any correct completion is a small victory
         } else {
             feedbackDisplay.textContent = '错误。正确的顺序是: ' + currentCorrectNoteNames.join(', ');
             feedbackDisplay.className = 'incorrect';
+            playSound('incorrect'); // Sound for incorrect answer
         }
         // checkAnswerButton.style.display = 'none'; // Button is already hidden or not used
         difficultySelect.disabled = false;
@@ -320,11 +434,12 @@ document.addEventListener('DOMContentLoaded', () => {
             optionCard.addEventListener('click', () => handleOptionClickSequence(noteDetail.noteName, optionCard));
             sequenceOptionsDisplay.appendChild(optionCard);
         });
+        // playSound('click'); // Optional: sound for starting game/new round
     }
 
     function handleOptionClickSequence(selectedNoteName, cardElement) {
         if (!gameStarted || currentSequenceStep >= 10) return;
-
+        playSound('click'); // Sound for clicking an option
         const currentChallengeNumber = sequenceFullChallenge[currentSequenceStep];
         const expectedNoteName = noteMapping[currentChallengeNumber].noteName; // Convert to 'C', 'G', 'B'
 
@@ -335,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
             boxToUpdate.classList.add('correct');
             boxToUpdate.classList.remove('incorrect'); // Just in case
             sequenceUserProgress.push(selectedNoteName); // Log correct selection
+            // playSound('correct'); // Sound for each correct step in sequence (can be too much)
         } else {
             boxToUpdate.textContent = 'X'; // Or noteMapping[currentChallengeNumber].noteName to show correct
             boxToUpdate.classList.add('incorrect');
@@ -343,6 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // We might want to end the round here if an error is made.
             // For this version, we'll let them finish the 10 steps.
             sequenceUserProgress.push(null); // Log incorrect selection as null or some other marker
+            playSound('incorrect'); // Sound for incorrect step in sequence
         }
         
         currentSequenceStep++;
@@ -372,11 +489,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (correctCount === 10) {
             feedbackDisplay.textContent = `太棒了! 10个全部正确!`;
             feedbackDisplay.className = 'correct';
-            score += 10; // Award 10 points for full sequence
-        } else {
+            score += 10; 
+            playSound('victory'); // Special victory sound for all 10 correct
+            triggerVictoryEffect(true); // true for a bigger confetti burst
+        } else if (correctCount > 0) { // Some correct answers
             feedbackDisplay.textContent = `完成了! 你答对了 ${correctCount} 个，共 10 个。`;
-            feedbackDisplay.className = correctCount > 5 ? 'correct' : 'incorrect'; // Partial credit visual
-            score += correctCount; // Award points for correct answers
+            feedbackDisplay.className = correctCount > 5 ? 'correct' : 'incorrect'; 
+            score += correctCount; 
+            playSound('correct'); // Regular correct sound if not all 10, but some are right
+        } else { // No correct answers
+            feedbackDisplay.textContent = `完成了! 你答对了 ${correctCount} 个，共 10 个。`;
+            feedbackDisplay.className = 'incorrect';
+            // playSound('incorrect'); // Already played for each incorrect step, maybe not needed here
         }
         scoreDisplay.textContent = score;
         
@@ -386,6 +510,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ---------- EFFECTS ----------
+    function triggerVictoryEffect(isGrandVictory = false) {
+        if (typeof confetti === 'function') {
+            // Basic confetti for any correct round completion
+            confetti({
+                particleCount: isGrandVictory ? 200 : 100,
+                spread: isGrandVictory ? 90 : 70,
+                origin: { y: 0.6 },
+                angle: isGrandVictory ? Math.random() * 60 + 60 : Math.random() * 40 + 70, // more centered for grand
+                scalar: isGrandVictory ? 1.2 : 1,
+                drift: isGrandVictory ? (Math.random() > 0.5 ? 1 : -1) * 0.2 : 0,
+                gravity: isGrandVictory ? 0.8 : 1,
+                ticks: isGrandVictory ? 300 : 200,
+                colors: ['#6a0dad', '#7e57c2', '#e1bee7', '#ffffff', '#f0e4f7']
+            });
+
+            if (isGrandVictory) {
+                // More spread out for grand victory
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 100,
+                        spread: 160,
+                        origin: { y: 0.5 },
+                        angle: Math.random() * 180,
+                        scalar: 1.3,
+                        drift: (Math.random() > 0.5 ? 1 : -1) * 0.3,
+                        gravity: 0.7,
+                        ticks: 400,
+                        colors: ['#ffc107', '#ffeb3b', '#fff59d'] // Gold/yellow for grand
+                    });
+                }, 200);
+            }
+        }
+    }
 
     // Initial setup when DOM is loaded
     function initializeGameView() {
