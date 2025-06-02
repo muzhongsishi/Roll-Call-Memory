@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记忆唱名游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>记忆唱名游戏</h1>
+        <div class="difficulty-selection">
+            <label for="difficulty">选择难度:</label>
+            <select id="difficulty">
+                <option value="3">简单 (3个数字)</option>
+                <option value="4">中等 (4个数字)</option>
+                <option value="5">困难 (5个数字)</option>
+                <option value="6">专家 (6个数字)</option>
+                <option value="7">大师 (7个数字)</option>
+            </select>
+            <button id="startGame">开始游戏</button>
+        </div>
+        <div class="game-area">
+            <div id="numbers-display">
+                <!-- Numbers will be displayed here -->
+            </div>
+            <div id="options-display">
+                <!-- Note name options will be displayed here -->
+            </div>
+            <div id="user-selection-display">
+                <h2>你选择的顺序:</h2>
+                <div id="selected-notes">
+                    <!-- User's selected notes will appear here -->
+                </div>
+            </div>
+        </div>
+        <button id="checkAnswer" style="display:none;">检查答案</button>
+        <button id="nextLevel" style="display:none;">下一关</button>
+        <div id="feedback"></div>
+        <div id="score-display">得分: <span id="score">0</span></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 

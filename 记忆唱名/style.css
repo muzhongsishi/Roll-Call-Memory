@@ -1,0 +1,155 @@
+body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; /* 可爱字体 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0e4f7; /* 淡紫色背景 */
+    margin: 0;
+    padding: 10px; /* Add some padding to prevent content touching edges */
+    box-sizing: border-box; /* Ensure padding doesn't expand body beyond 100% */
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 15px; /* 更圆的边角 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    text-align: center;
+    width: 90%; /* Control max width */
+    max-width: 600px; /* Set a max-width for larger screens */
+}
+
+h1 {
+    color: #6a0dad; /* 紫色标题 */
+    margin-bottom: 25px;
+}
+
+.difficulty-selection, .game-area, #feedback, #score-display {
+    margin-bottom: 25px;
+}
+
+#numbers-display, #options-display, #selected-notes {
+    display: flex;
+    justify-content: center;
+    gap: 12px; /* 略微增加间距 */
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.number-card, .option-card, .selected-card {
+    padding: 10px 15px;
+    border: 2px solid #d1c4e9; /* 淡紫色边框 */
+    border-radius: 10px; /* 更圆的卡片边角 */
+    background-color: #f3e5f5; /* 更淡的紫色背景 */
+    font-size: 1.1em;
+    min-width: 60px; /* Ensure cards have a minimum width */
+    text-align: center; /* Center text within cards */
+}
+
+.option-card {
+    cursor: pointer;
+    display: flex; /* Enable flex for vertical alignment */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    justify-content: center; /* Center children vertically */
+    transition: transform 0.2s ease, background-color 0.2s ease; /* 平滑过渡 */
+}
+
+.option-card:hover {
+    background-color: #e1bee7; /* 悬停时变深的淡紫色 */
+    transform: translateY(-3px); /* 轻微上浮效果 */
+}
+
+.option-card .option-note-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #4a148c; /* 深紫色音名 */
+}
+
+.option-card .option-solfege {
+    font-size: 0.9em;
+    color: #7b1fa2; /* 中紫色唱名 */
+}
+
+/* Selected card styling to match option card structure */
+.selected-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.selected-card .option-note-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #4a148c;
+}
+
+.selected-card .option-solfege {
+    font-size: 0.9em;
+    color: #7b1fa2;
+}
+
+
+button {
+    padding: 12px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px; /* 更圆的按钮 */
+    background-color: #7e57c2; /* 可爱的紫色按钮 */
+    color: white;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.2s ease; /* 平滑过渡 */
+}
+
+button:hover {
+    background-color: #5e35b1; /* 悬停时变深 */
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#feedback {
+    font-size: 1.1em;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#feedback.correct {
+    color: #388e3c; /* 深绿色 */
+    background-color: #e8f5e9; /* 淡绿色背景 */
+    font-weight: bold;
+}
+
+#feedback.incorrect {
+    color: #d32f2f; /* 深红色 */
+    background-color: #ffebee; /* 淡红色背景 */
+    font-weight: bold;
+}
+
+#score-display {
+    font-size: 1.2em;
+    color: #6a0dad;
+}
+
+/* Style for select dropdown */
+select#difficulty {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #d1c4e9;
+    background-color: #f3e5f5;
+    font-family: inherit; /* Use the same font as the body */
+    font-size: 0.95em;
+    color: #4a148c;
+    margin-right: 10px;
+}
+
+/* Style for labels */
+label[for="difficulty"] {
+    color: #6a0dad;
+    font-weight: bold;
+    margin-right: 5px;
+} 
